@@ -80,49 +80,47 @@
 
   // Return all elements of an array that pass a truth test.
   _.filter = function(collection, test) {
-    var arr = [];
-    for (var i = 0; i < collection.length; i++) {
-      if (test(collection[i])) {
-        arr.push(collection[i]);
+    var result = [];
+
+    _.each(collection, function(item) {
+      if (test(item)) {
+        result.push(item);
       }
-    }
-    return arr;
+    });
+
+    return result;
   };
 
   // Return all elements of an array that don't pass a truth test.
   _.reject = function(collection, test) {
     // TIP: see if you can re-use _.filter() here, without simply
     // copying code in and modifying it
-    var arr = [];
-    for (var i = 0; i < collection.length; i++) {
-      if (!test(collection[i])) {
-        arr.push(collection[i]);
-      }
-    }
-    return arr;
+    return _.filter(collection, function(value){
+      return !test(value);
+    });
   };
 
   // Produce a duplicate-free version of the array.
   _.uniq = function(array, isSorted, iterator) {
-    if (!isSorted) {
-      array = array.sort();
-    }
     var arr = [];
     var result = [];
-    if(iterator) {
-      for (var i = 0; i < array.length; i++) {
-        if (_.indexOf(arr, iterator(array[i])) === -1) {
-          arr.push(iterator(array[i]));
-          result.push(array[i]);
+
+    if (iterator) {
+      _.each(array, function(item) {
+        if (_.indexOf(arr, iterator(item)) === -1) {
+          arr.push(iterator(item));
+          result.push(item);
         }
-      }
+      });
+
       return result;
     } else {
-      for (var i = 0; i < array.length; i++) {
-        if (_.indexOf(arr, array[i]) === -1) {
-          arr.push(array[i]);
+      _.each(array, function(item) {
+        if (_.indexOf(arr, item) === -1) {
+          arr.push(item);
         }
-      }
+      });
+
       return arr;
     }
   };
@@ -134,9 +132,11 @@
     // like each(), but in addition to running the operation on all
     // the members, it also maintains an array of results.
     var result = [];
-    for (var i = 0; i < collection.length; i++) {
-      result.push(iterator(collection[i]));
-    }
+
+    _.each(collection, function(item) {
+      result.push(iterator(item));
+    });
+
     return result;
   };
 
@@ -179,17 +179,13 @@
   //   }); // should be 5, regardless of the iterator function passed in
   //          No accumulator is given so the first element is used.
   _.reduce = function(collection, iterator, accumulator) {
-    if (accumulator !== undefined) {
-      for (var i = 0; i < collection.length; i++) {
-        accumulator = iterator(accumulator, collection[i]);
+    _.each(collection, function(item, index){
+      if (index === 0 && accumulator === undefined) {
+        accumulator = _.first(collection);
+      } else {
+        accumulator = iterator(accumulator, item);
       }
-    } else {
-      accumulator = collection[0];
-
-      for (var i = 1; i < collection.length; i++) {
-        accumulator = iterator(accumulator, collection[i]);
-      }
-    }
+    });
     
     return accumulator;
   };
